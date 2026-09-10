@@ -28,10 +28,12 @@ const getApiBaseUrl = () => {
 export async function getPageSEO(slug: string): Promise<PageSEO | null> {
   try {
     const baseUrl = getApiBaseUrl();
+    if (!baseUrl) return null;
     // In pub-club-cms, the general `/api/pages` GET route requires admin session (unauthorized on client),
     // but the individual `/api/pages/[slug]` GET route is fully public. Thus, we fetch directly by slug.
     const response = await fetch(`${baseUrl}/api/pages/${slug}`, {
       next: { revalidate: 60 }, // Revalidate with ISR every 60 seconds
+      signal: AbortSignal.timeout(5000),
     });
     if (!response.ok) return null;
     const json = await response.json();

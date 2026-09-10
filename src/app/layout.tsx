@@ -26,8 +26,10 @@ const getApiBaseUrl = () => {
 async function getGlobalSEO() {
   try {
     const baseUrl = getApiBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/seo/global`, {
       next: { revalidate: 60 }, // Revalidate with ISR every 60 seconds
+      signal: AbortSignal.timeout(5000),
     });
     if (!response.ok) return null;
     const json = await response.json();

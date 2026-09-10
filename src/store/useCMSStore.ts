@@ -82,7 +82,6 @@ const getApiBaseUrl = () => {
 };
 
 export const useCMSStore = create<CMSStoreState & CMSStoreActions>(
-
   (set, get) => ({
     pages: {},
     isLoading: {},
@@ -329,9 +328,12 @@ export const useCMSStore = create<CMSStoreState & CMSStoreActions>(
       }
       try {
         const baseUrl = getApiBaseUrl();
-        const response = await fetch(`${baseUrl}/api/blogs?visibility=published`, {
-          next: { revalidate: 60 },
-        });
+        const response = await fetch(
+          `${baseUrl}/api/blogs?visibility=published`,
+          {
+            next: { revalidate: 60 },
+          },
+        );
 
         if (!response.ok) {
           throw new Error("Failed to fetch blogs data");
@@ -366,7 +368,7 @@ export const useCMSStore = create<CMSStoreState & CMSStoreActions>(
         const json = await response.json();
         if (json.success && json.data) {
           set((state) => ({
-            blogPosts: { ...state.blogPosts, [slug]: json.data }
+            blogPosts: { ...state.blogPosts, [slug]: json.data },
           }));
           return json.data;
         }

@@ -5,8 +5,12 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const cmsApiUrl = process.env.NEXT_PUBLIC_CMS_API_URL || "";
   try {
+    if (!cmsApiUrl) {
+      return new Response("Error loading sitemap: CMS URL not configured", { status: 500 });
+    }
     const res = await fetch(`${cmsApiUrl}/api/seo/sitemap`, {
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(5000),
     });
 
     if (!res.ok) {
