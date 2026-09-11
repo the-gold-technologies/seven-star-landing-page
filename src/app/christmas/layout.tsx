@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     ...metadata,
     alternates: {
-      canonical: "https://sevenstarsatmb.co.uk/christmas2026",
+      canonical: "https://sevenstarsatmb.co.uk/christmas",
     },
   };
 }
@@ -34,7 +34,7 @@ export default async function ChristmasLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const seo = await getPageSEO("christmas2026");
+  const seo = await getPageSEO("christmas");
   const schema = seo?.schema;
 
   return (

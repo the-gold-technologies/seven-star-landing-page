@@ -41,13 +41,13 @@ export default function ChristmasPage() {
   const pageData = pages["christmas"] || {};
   const storeLoading = isLoading["christmas"] ?? true;
 
-  // Visibility guard: if loaded and not published, redirect to 404
-  // Note: notFound() only works in Server Components; use router.replace() in client components
-  useEffect(() => {
-    if (!storeLoading && pageData.visibility !== "published") {
-      router.replace("/not-found");
-    }
-  }, [storeLoading, pageData.visibility, router]);
+  // // Visibility guard: if loaded and not published, redirect to 404
+  // // Note: notFound() only works in Server Components; use router.replace() in client components
+  // useEffect(() => {
+  //   if (!storeLoading && pageData.visibility !== "published") {
+  //     router.replace("/not-found");
+  //   }
+  // }, [storeLoading, pageData.visibility, router]);
 
   // Page loader timer — must stay above any conditional return (Rules of Hooks)
   useEffect(() => {
