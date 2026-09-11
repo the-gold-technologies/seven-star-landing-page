@@ -1,6 +1,5 @@
 "use client";
 
-
 import Link from "next/link";
 import Image from "next/image";
 import { useCMSStore } from "@/store/useCMSStore";
@@ -390,15 +389,15 @@ export default function Footer() {
           </div>
         </div>
         <div className="flex items-center gap-1 text-[8px] text-[#3F6EA9] text-end -mt-6 mb-4 justify-end">
-          Made with <span className="text-red-500 ">♥</span> by{" "}
+          Designed & developed by{" "}
           <a
-            href="#"
+            href="https://thegoldtechnologies.com"
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="Ebrand (opens in a new tab)"
+            aria-label="The Gold Technologies (opens in a new tab)"
             className="font-bold underline decoration-white/20 transition-colors"
           >
-            Ebrand
+            TGT
           </a>
         </div>
       </div>
