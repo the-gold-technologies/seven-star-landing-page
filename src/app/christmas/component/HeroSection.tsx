@@ -40,7 +40,7 @@ export const HeroSection = ({ heroRef, heroBgRef, data }: HeroSectionProps) => {
   const ctaText1 = data?.ctaText1 || "Book Your Christmas Table";
   const ctaLink1 = data?.ctaLink1 || "https://www.opentable.co.uk/r/the-seven-stars-at-marsh-baldon-reservations-oxford?restref=459243&lang=en-GB&ot_source=Restaurant%20website";
   const ctaText2 = data?.ctaText2 || "View Festive Menus";
-  const ctaLink2 = data?.ctaLink2 || "#menus";
+  const ctaLink2 = data?.ctaLink2 || "/Christmas/ChristmasMenusFinal.pdf";
   const backgroundImage = data?.backgroundImage || "/Christmas/Christmas-hero-new-image.jpg";
 
   return (

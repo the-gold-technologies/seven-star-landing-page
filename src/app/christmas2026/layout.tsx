@@ -14,7 +14,7 @@ export default async function ChristmasLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const seo = await getPageSEO("christmas");
+  const seo = await getPageSEO("christmas2026");
   const schema = seo?.schema;
 
   return (
