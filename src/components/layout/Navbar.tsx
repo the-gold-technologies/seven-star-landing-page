@@ -68,7 +68,7 @@ export default function Navbar() {
         }))
       : [];
 
-    // 1. Find and extract Christmas item
+    // 1. Find and extract standalone Christmas item if any
     let christmasItem: {
       name: string;
       href: string;
@@ -76,8 +76,16 @@ export default function Navbar() {
     } | null = null;
     const filteredForChristmas = rawItems.filter((item) => {
       const isChristmas =
-        item.href === "/christmas" ||
-        item.name.toLowerCase().includes("christmas");
+        (item.href === "/christmas" ||
+          item.name.toLowerCase().includes("christmas")) &&
+        !(
+          item.dropdown &&
+          item.dropdown.some(
+            (sub) =>
+              sub.href === "/events" ||
+              sub.name.toLowerCase().includes("event"),
+          )
+        );
       if (isChristmas) {
         christmasItem = {
           name: item.name,
@@ -125,8 +133,10 @@ export default function Navbar() {
     const eventsItemIdx = filteredForBlog.findIndex(
       (item) =>
         item.href === "/events" ||
+        item.href === "/christmas" ||
         item.name.toLowerCase() === "events" ||
-        item.name.toLowerCase() === "event",
+        item.name.toLowerCase() === "event" ||
+        item.name.toLowerCase() === "christmas",
     );
 
     const isChristmasPublished = pages["christmas"]
@@ -135,42 +145,53 @@ export default function Navbar() {
 
     if (eventsItemIdx !== -1) {
       const eventsItem = filteredForBlog[eventsItemIdx];
+      const existingDropdown = eventsItem.dropdown || [];
+
       if (isChristmasPublished) {
-        const existingDropdown = eventsItem.dropdown || [];
-        const hasChristmas = existingDropdown.some(
+        // When Christmas is published:
+        // Top-level menu displays "Christmas" by default.
+        // Dropdown has Christmas on top and Events below it.
+        const otherSubs = existingDropdown.filter(
           (sub) =>
-            sub.href === "/christmas" ||
-            sub.name.toLowerCase().includes("christmas"),
+            sub.href !== "/christmas" &&
+            sub.href !== "/events" &&
+            !sub.name.toLowerCase().includes("christmas") &&
+            !sub.name.toLowerCase().includes("event"),
         );
 
-        if (!hasChristmas) {
-          const dropdownItems = [];
-          if (existingDropdown.length === 0) {
-            dropdownItems.push({ name: "Events", href: "/events" });
-          } else {
-            dropdownItems.push(...existingDropdown);
-          }
-          dropdownItems.push(christmasItem);
-          filteredForBlog[eventsItemIdx] = {
-            ...eventsItem,
-            dropdown: dropdownItems,
-          };
-        }
-      } else if (eventsItem.dropdown) {
-        const cleanedDropdown = eventsItem.dropdown.filter(
+        const dropdownItems = [
+          { name: "Christmas", href: "/christmas" },
+          { name: "Events", href: "/events" },
+          ...otherSubs,
+        ];
+
+        filteredForBlog[eventsItemIdx] = {
+          ...eventsItem,
+          name: "Christmas",
+          href: "/christmas",
+          dropdown: dropdownItems,
+        };
+      } else {
+        // When Christmas is disabled:
+        // Top-level menu displays "Events", Christmas is removed from dropdown.
+        const cleanedDropdown = existingDropdown.filter(
           (sub) =>
             sub.href !== "/christmas" &&
             !sub.name.toLowerCase().includes("christmas"),
         );
+
         if (cleanedDropdown.length <= 1) {
           filteredForBlog[eventsItemIdx] = {
-            name: eventsItem.name,
-            href: eventsItem.href || "/events",
+            ...eventsItem,
+            name: "Events",
+            href: "/events",
             dropdown: undefined,
           };
         } else {
           filteredForBlog[eventsItemIdx] = {
             ...eventsItem,
+            name: "Events",
+            href: "/events",
             dropdown: cleanedDropdown,
           };
         }
