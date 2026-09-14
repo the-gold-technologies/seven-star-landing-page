@@ -167,7 +167,7 @@ export default function Navbar() {
 
         filteredForBlog[eventsItemIdx] = {
           ...eventsItem,
-          name: "Christmas",
+          name: "Christmas & Events",
           href: "/christmas",
           dropdown: dropdownItems,
         };
