@@ -6,6 +6,7 @@ import { Download } from "lucide-react";
 import { HangingOrnamentsMenus } from "./HangingOrnaments";
 import { SleighIcon, ReindeerIcon, SantaHatIcon } from "./Icons";
 import { parseMarkdownLinks } from "@/utils/text";
+import { downloadFile } from "@/utils/download";
 
 interface MenuType {
   title: string;
@@ -41,7 +42,8 @@ export const MenusSection = ({
   const tagline = data?.tagline || "Culinary Delights";
   const heading = data?.heading || "Download Our";
   const headingHighlight = data?.headingHighlight || "Festive Menus";
-  const menus = data?.menusList && data.menusList.length > 0 ? data.menusList : [];
+  const menus =
+    data?.menusList && data.menusList.length > 0 ? data.menusList : [];
 
   const currentMenu = menus[activeMenuTab] || menus[0] || {};
   const currentHighlights = currentMenu.highlights || [];
@@ -197,14 +199,17 @@ export const MenusSection = ({
               </div>
 
               <div className="pt-6">
-                <a
-                  href={`/api/download?url=${encodeURIComponent(currentMenu.link)}`}
-                  download
+                <button
+                  type="button"
+                  onClick={() => {
+                    const filename = `${(currentMenu.title || "festive").toLowerCase().replace(/[^a-z0-9]+/g, "-")}-menu.pdf`;
+                    downloadFile(currentMenu.link, filename);
+                  }}
                   aria-label={`Download ${currentMenu.title || "Festive"} Menu (PDF Format)`}
-                  className="inline-flex items-center gap-2 px-6 py-3.5 bg-[#B91C1C] hover:bg-[#990000] text-white uppercase tracking-widest text-[10px] font-bold rounded-full transition-all shadow-[0_0_15px_rgba(185,28,28,0.2)]"
+                  className="cursor-pointer inline-flex items-center gap-2 px-6 py-3.5 bg-[#B91C1C] hover:bg-[#990000] text-white uppercase tracking-widest text-[10px] font-bold rounded-full transition-all shadow-[0_0_15px_rgba(185,28,28,0.2)]"
                 >
                   <Download size={14} /> Download PDF Menu <SleighIcon />
-                </a>
+                </button>
               </div>
             </div>
 

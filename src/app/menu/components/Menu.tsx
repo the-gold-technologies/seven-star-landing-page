@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { parseMarkdownLinks } from "@/utils/text";
+import { downloadFile } from "@/utils/download";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -155,8 +156,8 @@ export default function Menu({ data = {} }: { data?: any }) {
   const activePage =
     activeSection?.pages?.[pageIdx] || activeSection?.pages?.[0] || null;
 
-  // Resolve active section's specific PDF URL
-  const getActiveSectionPdf = () => {
+  // Resolve active section or page download URL (PDF or Image)
+  const getActiveDownloadUrl = () => {
     if (activeSection?.pdf && activeSection.pdf !== "#") {
       return activeSection.pdf;
     }
@@ -167,17 +168,28 @@ export default function Menu({ data = {} }: { data?: any }) {
     ) {
       return data.menuPdfs[sectionIdx];
     }
+    if (activePage?.image) {
+      return activePage.image;
+    }
+    if (activeSection?.image) {
+      return activeSection.image;
+    }
     return null;
   };
 
-  const activePdfUrl = getActiveSectionPdf();
+  const activeDownloadUrl = getActiveDownloadUrl();
+  const isImageDownload = Boolean(
+    activeDownloadUrl &&
+    /\.(jpe?g|png|webp|svg|gif|avif)(\?.*)?$/i.test(activeDownloadUrl),
+  );
+  const downloadTypeLabel = isImageDownload ? "Image" : "PDF";
 
   const handleDownload = async () => {
-    const pdfUrl = getActiveSectionPdf();
+    const fileUrl = getActiveDownloadUrl();
 
-    if (!pdfUrl) {
+    if (!fileUrl) {
       setDownloadToast(
-        `No PDF menu available for ${activeSection?.title || "this section"}.`,
+        `No download available for ${activeSection?.title || "this section"}.`,
       );
       setTimeout(() => setDownloadToast(null), 3000);
       return;
@@ -185,27 +197,27 @@ export default function Menu({ data = {} }: { data?: any }) {
 
     setIsDownloading(true);
     try {
-      setDownloadToast(`Downloading ${activeSection?.title || "menu"} PDF...`);
-      const downloadUrl = `/api/download?url=${encodeURIComponent(pdfUrl)}`;
-      const link = document.createElement("a");
-      link.href = downloadUrl;
-      const filename =
-        pdfUrl.split("/").pop()?.split("?")[0] ||
-        `${activeSection?.title || "menu"}.pdf`;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
+      setDownloadToast(
+        `Downloading ${activeSection?.title || "menu"} ${downloadTypeLabel}...`,
+      );
+      const cleanTitle = (activeSection?.title || "menu")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+      const ext = isImageDownload
+        ? fileUrl.split(".").pop()?.split("?")[0] || "jpg"
+        : "pdf";
+      const filename = `${cleanTitle}-menu.${ext}`;
+
+      await downloadFile(fileUrl, filename);
     } catch (err) {
       console.error("Download failed:", err);
-      window.open(pdfUrl, "_blank");
+      window.open(fileUrl, "_blank");
     } finally {
       setIsDownloading(false);
       setTimeout(() => setDownloadToast(null), 3000);
     }
   };
-
-
 
   if (!activeSection) return null;
 
@@ -362,10 +374,12 @@ export default function Menu({ data = {} }: { data?: any }) {
                     {(() => {
                       const pdfUrl =
                         activeSection?.pdf ||
-                        (Array.isArray(data.menuPdfs) && data.menuPdfs[sectionIdx]) ||
+                        (Array.isArray(data.menuPdfs) &&
+                          data.menuPdfs[sectionIdx]) ||
                         null;
 
-                      const pageImage = activePage?.image || activeSection?.image;
+                      const pageImage =
+                        activePage?.image || activeSection?.image;
 
                       if (pageImage) {
                         return (
@@ -429,17 +443,17 @@ export default function Menu({ data = {} }: { data?: any }) {
                   <button
                     id="menu-download-btn"
                     onClick={handleDownload}
-                    disabled={isDownloading || !activePdfUrl}
-                    aria-label={`Download ${activeSection?.title || "Menu"} (PDF Format)`}
+                    disabled={isDownloading || !activeDownloadUrl}
+                    aria-label={`Download ${activeSection?.title || "Menu"} (${downloadTypeLabel} Format)`}
                     title={
-                      activePdfUrl
-                        ? `Download ${activeSection?.title || "menu"} PDF (PDF Format)`
-                        : `No PDF available for ${activeSection?.title || "this menu"}`
+                      activeDownloadUrl
+                        ? `Download ${activeSection?.title || "menu"} (${downloadTypeLabel} Format)`
+                        : `No download available for ${activeSection?.title || "this menu"}`
                     }
                     className={`transition-colors flex items-center gap-2 ${
                       isDownloading
                         ? "text-[#475DB1] animate-pulse cursor-wait"
-                        : activePdfUrl
+                        : activeDownloadUrl
                           ? "text-neutral-400 hover:text-[#475DB1] cursor-pointer"
                           : "text-neutral-300 opacity-40 cursor-not-allowed"
                     }`}
