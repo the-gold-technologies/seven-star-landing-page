@@ -58,9 +58,8 @@ export const CelebrateSection = ({ data }: CelebrateSectionProps) => {
       alt: "Friends celebrating New Year's Eve at the pub",
       title: "New Year's Eve",
       text: "See in the New Year with us — good drinks, good company and a toast at midnight.",
-      link: "#",
-      label: "Coming Soon",
-      external: true,
+      link: "/Christmas/NewYearEveMenu2027.pdf",
+      label: "New Year's Eve Menu",
     },
   ];
 
